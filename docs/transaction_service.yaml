@@ -1,0 +1,187 @@
+openapi: '3.0.3'
+info:
+  title: Transaction Service
+  version: '1.0'
+  description: >-
+    Service for sending money, withdraw money, and recurring transaction.
+servers:
+  - url: http://127.0.0.1:8001
+tags:
+  - name: Transaction
+    description: Transaction in the Application
+paths:
+  /transaction/send:
+    post:
+      tags:
+        - Transaction
+      security:
+        - BearerAuth: []
+      summary: Send money to address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMoneyRequest'
+      responses:
+        '200':
+          description: Send money success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                receiverNotExist:
+                  value:
+                    message: "Receiver not Exist"
+                paymentAccountNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                currencyNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                balanceNotEnough:
+                  value:
+                    message: "Payment Balance is not enough"
+        '401':
+          description: 'Unauthorized'
+  /transaction/withdraw:
+    post:
+      tags:
+        - Transaction
+      security:
+        - BearerAuth: []
+      summary: Withdraw money
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawMoneyRequest'
+      responses:
+        '200':
+          description: Send money success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                paymentAccountNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                currencyNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                balanceNotEnough:
+                  value:
+                    message: "Payment Balance is not enough"
+        '401':
+          description: 'Unauthorized'
+
+  /transaction/recurring:
+    post:
+      tags:
+        - Transaction
+      security:
+        - BearerAuth: []
+      summary: Recurring Money
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawMoneyRequest'
+      responses:
+        '200':
+          description: Send money success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                paymentAccountNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                currencyNotExist:
+                  value:
+                    message: "Payment Account not Exist"
+                balanceNotEnough:
+                  value:
+                    message: "Payment Balance is not enough"
+        '401':
+          description: 'Unauthorized'
+  
+components:
+  schemas:
+    SendMoneyRequest:
+        type: object
+        properties:
+          to:
+            type: string
+            example: "13531524343"
+          amount:
+            type: number
+            example: 15000
+            description: value of payment account
+          fromAccount:
+            type: number
+            example: 1
+            description: id of payment account
+          currency:
+            type: string
+            example: IDR
+            description: only allowed currency and can be null
+            nullable: true
+
+    WithdrawMoneyRequest:
+        type: object
+        properties:
+          amount:
+            type: number
+            example: 15000
+            description: value of payment account
+          fromAccount:
+            type: number
+            example: 1
+            description: id of payment account
+          currency:
+            type: string
+            example: IDR
+            description: only allowed currency and can be null
+            nullable: true
+    
+    RecurringRequest:
+        type: object
+        properties:
+          to:
+            type: string
+            example: "13531524343"
+          amount:
+            type: number
+            example: 15000
+            description: value of payment account
+          fromAccount:
+            type: number
+            example: 1
+            description: id of payment account
+          currency:
+            type: string
+            example: IDR
+            description: only allowed currency and can be null
+            nullable: true
+          days:
+            type: number
+            example: 20
+            description: min 1, max 31. exact day of month
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+         
+  

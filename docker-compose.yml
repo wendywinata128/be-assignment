@@ -1,0 +1,67 @@
+name: be-assignment-transaction
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - 127.0.0.1:5432:5432
+    networks:
+      - be_assignment_networks
+    volumes:
+      - db_assignment_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  migration:
+    build: 
+      context: .
+      dockerfile: ./migration/Dockerfile
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - be_assignment_networks
+    depends_on:
+      - postgres  
+
+  account_manager_service:
+    build:
+      context: .
+      dockerfile: ./account_manager_service/Dockerfile
+    volumes:
+      - ./prisma/:/app/prisma/
+      - ./account_manager_service/src:/app/src/
+    networks:
+      - be_assignment_networks
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - ANON_KEY=${ANON_KEY}
+    ports:
+      - 127.0.0.1:8000:8000
+    depends_on:
+      - postgres
+
+  transaction_service:
+    build:
+      context: .
+      dockerfile: ./transaction_service/Dockerfile
+    networks:
+      - be_assignment_networks
+    volumes:
+      - ./prisma/:/app/prisma/
+      - ./transaction_service/src:/app/src/
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - ANON_KEY=${ANON_KEY}
+    ports:
+      - 127.0.0.1:8001:8001
+    depends_on:
+      - postgres
+
+networks:
+  be_assignment_networks:
+
+volumes:
+  db_assignment_volume:

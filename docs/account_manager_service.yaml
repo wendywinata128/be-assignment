@@ -1,0 +1,178 @@
+openapi: '3.0.3'
+info:
+  title: Account Manager Service
+  version: '1.0'
+  description: >-
+    Service for authentication, managing payment account, and get user payment history.
+servers:
+  - url: http://127.0.0.1:8000
+tags:
+  - name: Authentication
+    description: Authentication in the application
+  - name: Payment Account Manager
+    description: Manage payment account
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Login User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Authentication'
+      responses:
+        '200':
+          description: Login Success
+        '400':
+          description: Field Validation Failed
+        '401':
+          description: Username or password incorrect
+  /signup:
+    post:
+      tags:
+        - Authentication
+      summary: Register new User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Authentication'
+      responses:
+        '200':
+          description: Login Success
+        '400':
+          description: Field Validation Failed
+  
+  /payments:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Payment Account Manager
+      summary: Get payment account of users
+      responses:
+        '200':
+          description: Retrieve data success
+        '401':
+          description: 'Unauthorized'
+    post:
+      tags:
+        - Payment Account Manager
+      security:
+        - BearerAuth: []
+      summary: Add new payment account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentAccount'
+      responses:
+        '200':
+          description: Add payment account success
+        '400':
+          description: Field Validation Failed
+        '401':
+          description: 'Unauthorized'
+  /payments/{id}:
+    put:
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of payment accounts
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentAccount'
+      tags:
+        - Payment Account Manager
+      summary: Edit payment account
+      responses:
+        '200':
+          description: Edit data success
+        '400':
+          description: Payment account not found
+        '401':
+          description: 'Unauthorized'
+    delete:
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of payment accounts
+          required: true
+          schema:
+            type: integer
+            example: 1
+      tags:
+        - Payment Account Manager
+      summary: Delete payment account
+      responses:
+        '200':
+          description: Retrieve data success
+        '400':
+          description: Payment account not found
+        '401':
+          description: 'Unauthorized'
+  /payments/history:
+    get: 
+      security:
+        - BearerAuth: []
+      tags:
+        - Payment History
+      responses:
+        '200':
+          description: Retrieve payment history success
+        '401':
+          description: 'Unauthorized'
+components:
+  schemas:
+    Authentication:
+      type: object
+      properties:
+        email:
+          type: string
+          example: wendywinata128@gmail.com
+        password:
+          type: string
+          example: 12345678
+
+    PaymentAccount:
+        type: object
+        properties:
+          name:
+            type: string
+            example: Credit
+          amount:
+            type: number
+            example: 15000
+            description: initial value of payment account
+          currency:
+            type: string
+            example: IDR
+            description: only allowed currency
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+         
+  
