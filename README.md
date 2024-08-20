@@ -53,27 +53,29 @@ Complete documentation about endpoints can be found at `docs` folder
 
 ### Transaction Service
 - `POST /transaction/send` Send money
+
 - `POST /transaction/withdraw` Withdraw money
+
 - `POST /transaction/recurring` Recurring transaction
 
 ## Application Logic
 ### Core Transaction Process
-1. Request body for transaction will be validated with `express-validator` library.
-2. Receiver transaction will be checked if exist with `checkIfReceiverExist` methods.
+1. Request body for transaction will be validated with `express-validator` library. Validations saved in `validations folder`
+2. Receiver of the transaction will be checked if exist with `checkIfReceiverExist` methods.
 3. Payment Account will be checked if exist.
 4. Currency will be checked if exist.
-5. Transaction currency will be **converted** to payment account currency.
-6. Payment account balance will be checked if enough.
+5. Transaction amount will be **converted** to payment account currency. This process can be found in `src/lib/currencies.js`
+6. Payment account balance will be checked if theres enough balance to do transaction.
 7. **If all validations is passed, transaction will be created**.
-8. User payment history will be created.
-9. User payment account will be updated with new balance.
+8. A payment history record for the user will be created.
+9. The user's payment account balance will be updated to reflect the new amount.
 
 ### Recurring Proccess
 1. Request body for recurring process will be validated with `express-validator` library.
-2. Store recurring details into `transaction recurring table`
+2. Recurring details will be stored into `transaction recurring table`
 3. Recurring transaction will be scheduled with `node-cron` library.
 4. In scheduled cron, we will call [Transaction Process](#core-transaction-process).
-5. If `processTransaction` failed, scheduled task will be stopped and status data in `transaction recurring table` will be updated to false.
+5. If `processTransaction` failed, scheduled task will be stopped and status column in `transaction recurring data` will be updated to false.
 
 ### Maintain Recurring Process
 The reason I choose to store recurring details in `transaction recurring table` because I want to maintain recurring process everytime application restarted. The process will be as follow :
@@ -88,14 +90,18 @@ The reason I choose to store recurring details in `transaction recurring table` 
 The authentication and authorization is maintained by supabase with JWT token.
 
 ### Folder Management
-- config -> manage library config, such as prisma and supabase.
-- controllers -> manage application logic.
-- entity -> manage entity or model in the applications.
-- lib -> manage third party libraries.
-- middleware -> manage application middleware
-- routes -> manage application routes.
-- utils -> manage utils in the application, such as global functions.
-- process -> manage complicated logics.
-- validations -> manage field validations in the applications.
+- config -> Manage library config, such as prisma and supabase.
+- controllers -> Manage application logic.
+- entity -> Manage entity or model in the applications.
+- lib -> Manage third party libraries.
+- middleware -> Manage application middleware
+- routes -> Manage application routes.
+- utils -> Manage utils in the application, such as global functions.
+- process -> Manage complicated logics.
+- validations -> Manage field validations in the applications.
+
+## Contact
+- Email: wendywinata128@gmail.com
+- LinkedIn: https://www.linkedin.com/in/wendyyy/
 
 
